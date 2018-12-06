@@ -20,6 +20,8 @@ import com.sxjs.common.receiver.NetWorkChangeBroadcastReceiver;
 import com.sxjs.common.util.DialogUtil;
 
 import butterknife.Unbinder;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 /**
  * Created by admin on 2017/3/12.
@@ -83,11 +85,37 @@ public abstract class BaseActivity extends AppCompatActivity {
         }else if(!loadingDialog.isShowing()){
             loadingDialog.show();
         }
+
     }
 
     protected void hiddenProgressDialog(){
         if(loadingDialog != null && loadingDialog.isShowing()){
             loadingDialog.dismiss();
+        }
+    }
+
+
+    private CompositeDisposable disposables;
+
+    /**
+     * 添加观察者
+     * @param disposable d
+     */
+    public void addDisposable(Disposable disposable){
+        if(disposables == null){
+            disposables = new CompositeDisposable();
+        }
+        disposables.add(disposable);
+
+    }
+
+    /**
+     * 注销观察者，防止泄露
+     */
+    public void clearDisposable(){
+        if(disposables != null){
+            disposables.clear();
+            disposables = null;
         }
     }
 
@@ -98,7 +126,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             loadingDialog.dismiss();
             loadingDialog = null;
         }
-
+        clearDisposable();
         if(unbinder != null){
             unbinder.unbind();
         }
